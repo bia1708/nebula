@@ -6,6 +6,7 @@ import pprint
 from re import L
 
 import pynetbox
+import requests
 import yaml
 
 from nebula.common import utils
@@ -87,10 +88,13 @@ class netbox(utils):
         fport = ":" + str(self.netbox_server_port) if self.netbox_server_port else ""
         fbase_url = "/" + str(self.netbox_base_url) if self.netbox_base_url else ""
 
+        session = requests.Session()
+        session.verify = False  # Disable SSL certificate verification
         self.nb = pynetbox.api(
             f"http://{self.netbox_server}{fport}{fbase_url}",
             token=self.netbox_api_token,
         )
+        self.nb.http_session = session
 
     def interface(self):
         return self.nb
