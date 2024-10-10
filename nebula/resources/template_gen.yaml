@@ -113,7 +113,7 @@ pdu-config:
     help: "Outlet number on PDU for dev board"
     optional: True
     type: int
-    netbox_field: devices.power_ports.input.connected_endpoint.outlet
+    netbox_field: devices.power_ports.input.connected_endpoints[0].outlet
   field_4:
     name: username
     default: "username"
@@ -257,7 +257,7 @@ usbmux-config:
   field_1:
     name: search_path
     help: "Path to search for usbmux devices"
-    default: "/dev/usb-sd-mux/"
+    default: "/dev/"
     optional: True
   field_2:
     name: target_mux

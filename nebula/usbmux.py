@@ -21,7 +21,7 @@ log = logging.getLogger(__name__)
 class usbmux(utils):
     """USB SD Card MUX controller and helper methods"""
 
-    search_path = "/dev/usb-sd-mux/"
+    search_path = "/dev/usb-sd-mux"
     target_mux = None
     _mux_in_use = None
     _mux = None
