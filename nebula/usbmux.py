@@ -21,7 +21,7 @@ log = logging.getLogger(__name__)
 class usbmux(utils):
     """USB SD Card MUX controller and helper methods"""
 
-    search_path = "/dev/usb-sd-mux/"
+    search_path = "/dev/"
     target_mux = None
     _mux_in_use = None
     _mux = None
@@ -82,6 +82,7 @@ class usbmux(utils):
         self.set_mux_mode("host")
         time.sleep(5)
         context = pyudev.Context()
+        print(self._target_sdcard)
         for device in context.list_devices(subsystem="block"):
             if device.get("ID_SERIAL_SHORT") == os.path.basename(
                 self._mux_in_use

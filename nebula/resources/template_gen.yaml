@@ -257,7 +257,7 @@ usbmux-config:
   field_1:
     name: search_path
     help: "Path to search for usbmux devices"
-    default: "/dev/usb-sd-mux/"
+    default: "/dev/"
     optional: True
   field_2:
     name: target_mux
