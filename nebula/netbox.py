@@ -110,6 +110,7 @@ class netbox(utils):
         self, include_variants=False, include_children=False, **filters
     ):
         devices = self.nb.dcim.devices.filter(**filters)
+        intf = self.nb.ipam.mgmt
         devices_names = list()
         for device in devices:
             device_dict = dict(device)
@@ -384,6 +385,7 @@ class NetboxDevice:
 
     def to_config(self, template):  # noqa: C901
         log.info("Generating config for {}".format(self.devices.name))
+        print(self.devices)
         template_dict = dict()
         required_fields = list()
         if template:
