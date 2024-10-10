@@ -64,6 +64,8 @@ class pdu(utils):
         """Power Down Board"""
         log.info(f"Powering off {self.board_name}")
         if self.pdu_type == "cyberpower":
+            print("OUTLET")
+            print(self.outlet)
             self.pdu_dev.set_outlet_on(self.outlet, False)
         elif self.pdu_type == "vesync":
             self.pdu_dev.outlets[self.outlet].turn_off()

@@ -276,6 +276,8 @@ class manager:
             try:
                 if self.usbsdmux:
                     log.info("Will try to recover using usb-sd mux...")
+                    print("PRINT")
+                    print(self.usbsdmux)
                     self.power.power_down_board()
                     if sdcard:
                         # TODO: Recover using SD card boot files
