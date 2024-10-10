@@ -875,7 +875,6 @@ class downloader(utils):
                     devicetree_overlay,
                     modules,
                 )
-
             if folder:
                 if folder == "boot_partition":
                     self._get_files_boot_partition(

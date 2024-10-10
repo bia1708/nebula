@@ -41,6 +41,8 @@ class CyberPowerPdu(object):
 
     def __init__(self, host):
         self.host = host
+        print("HOST")
+        print(host)
 
     def set_outlet_on(self, outlet, on):
         """

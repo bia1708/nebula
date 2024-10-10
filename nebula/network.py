@@ -85,6 +85,7 @@ class network(utils):
         for t in range(retries):
             try:
                 log.info("Checking for board through SSH")
+                print("SSH: " + self.dutusername + "@" + self.dutip + " " + self.dutpassword)
                 result = fabric.Connection(
                     self.dutusername + "@" + self.dutip,
                     connect_kwargs={"password": self.dutpassword},

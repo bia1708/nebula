@@ -110,6 +110,7 @@ class netbox(utils):
         self, include_variants=False, include_children=False, **filters
     ):
         devices = self.nb.dcim.devices.filter(**filters)
+        intf = self.nb.ipam.mgmt
         devices_names = list()
         for device in devices:
             device_dict = dict(device)
@@ -303,12 +304,12 @@ class NetboxDevice:
         self.data["devices"].update({"power_ports": dict()})
         for pow in pow_raw:
             # get associated oulet
-            outlet_id = pow["connected_endpoint"]["id"]
+            outlet_id = pow["connected_endpoints"][0]["id"]
             outlet = self.nbi.get_power_outlets(id=outlet_id)
-            pow["connected_endpoint"]["outlet"] = outlet[0]["custom_fields"]["outlet"]
+            pow["connected_endpoints"][0]["outlet"] = outlet[0]["custom_fields"]["outlet"]
 
             # get ip of pdu
-            pdu_raw = self.nbi.get_devices(id=pow["connected_endpoint"]["device"]["id"])
+            pdu_raw = self.nbi.get_devices(id=pow["connected_endpoints"][0]["device"]["id"])
             pow["pdus"] = list()
             for pdu in pdu_raw:
                 pow["pdus"].append(pdu)
