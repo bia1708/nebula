@@ -79,6 +79,10 @@ zynq-coraz7s-cn0501:
   addons:
   - EVAL-CN0501
   carrier: CORAZ7S
+zynq-coraz7s-cn0579_i2c:
+  addons:
+  - EVAL-CN0579
+  carrier: CORAZ7S
 zynq-coraz7s-cn0540:
   addons:
   - EVAL-CN0540-ARDZ
