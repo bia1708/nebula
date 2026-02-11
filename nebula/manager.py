@@ -679,6 +679,7 @@ class manager:
         # CANNOT USE JTAG TO POWERCYCLE IT DOES NOT WORK
         # stop uart logging first
         try:
+            log.info(len(self.monitor))
             self.monitor[0].stop_log()
             self.monitor[0].__del__()
             log.info(len(self.monitor))
@@ -686,8 +687,9 @@ class manager:
             self.power.power_cycle_board()
             log.info("Waiting for boot to complete")
             log.info("MY FIX")
-            # from time import sleep
-            # sleep(5)
+            from time import sleep
+            sleep(5)
+            log.info("sleep")
             self.monitor[0].reinitialize_uart()
             log.info(len(self.monitor))
             results = self.monitor[0]._read_until_done_multi(
