@@ -423,3 +423,18 @@ class network(utils):
                     f"Checksum does not match for {file_path}:\
                          Ref: {reference} Actual: {result.stdout.strip()}"
                 )
+            
+    def verify_checksum_from_partition(self, file_size, reference_hash, algo="sha256", device="mmcblk0"):
+        if algo == "sha256":
+            ssh_command = 'python -c "import hashlib; import subprocess; import glob;'
+            ssh_command += f" parts = sorted(glob.glob('/dev/{device}p*'));"
+            ssh_command += " partition_path = parts[2] if len(parts) >= 3 else None;"
+            ssh_command += f" print(hashlib.sha256(subprocess.run(['dd', 'if=' + partition_path, 'bs={file_size}', 'count=1'], capture_output=True, check=True).stdout).hexdigest())\""
+            result = self.run_ssh_command(
+                command=ssh_command, print_result_to_file=False, show_log=False
+            )
+            if not reference_hash == result.stdout.strip():
+                raise Exception(
+                    f"Checksum does not match for {device} partition 3:\
+                         Ref: {reference_hash} Actual: {result.stdout.strip()}"
+                )

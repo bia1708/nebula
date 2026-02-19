@@ -1178,8 +1178,9 @@ class downloader(utils):
                 sha256_hash.update(data)
                 bar.update(size)
         hash = sha256_hash.hexdigest()
+        file_size = os.path.getsize(fname)
         with open(os.path.join(os.path.dirname(fname), "hashes.txt"), "a") as h:
-            h.write(f"{os.path.basename(fname)},{hash}\n")
+            h.write(f"{os.path.basename(fname)},{hash},{file_size}\n")
 
     def check(self, fname, ref):
         hash_md5 = hashlib.md5()
