@@ -778,6 +778,103 @@ class downloader(utils):
             # unzip the files
             shutil.unpack_archive(file, dest)
 
+    def _get_files_cyclone5(
+        self,
+        design_name,
+        source,
+        source_root,
+        branch,
+        url_template=None,
+    ):
+        """
+        Download boot files for Cyclone5 projects (de10nano).
+        """
+        if source == "artifactory":
+            if url_template:
+                url_template = (
+                    sanitize_artifactory_url(url_template) + "/boot_partition/{}/{}"
+                )
+            else:
+                url_template = "https://{}/artifactory/sdg-generic-development/boot_partition/{}/{}/{}"
+
+        kernel_root = "socfpga_cyclone5_common"
+
+        log.info("Getting Cyclone5 boot files")
+
+        # Get kernel (zImage)
+        log.info("Getting zImage")
+        self._get_file(
+            "zImage",
+            source,
+            kernel_root,
+            source_root,
+            branch,
+            url_template=url_template,
+        )
+
+        # Get soc_system.rbf (FPGA bitstream)
+        log.info("Getting soc_system.rbf")
+        self._get_file(
+            "soc_system.rbf",
+            source,
+            design_name,
+            source_root,
+            branch,
+            url_template=url_template,
+        )
+
+        # Get device tree (socfpga.dtb)
+        log.info("Getting socfpga.dtb")
+        self._get_file(
+            "socfpga.dtb",
+            source,
+            design_name,
+            source_root,
+            branch,
+            url_template=url_template,
+        )
+
+        # Get u-boot.scr
+        log.info("Getting u-boot.scr")
+        self._get_file(
+            "u-boot.scr",
+            source,
+            design_name,
+            source_root,
+            branch,
+            url_template=url_template,
+        )
+
+        # Get extlinux.conf from socfpga_cyclone5_common/extlinux/
+        log.info("Getting extlinux.conf")
+        self._get_file(
+            "extlinux.conf",
+            source,
+            kernel_root,
+            source_root,
+            branch,
+            url_template=url_template,
+        )
+
+        # Get preloader (u-boot-with-spl.sfp)
+        log.info("Getting u-boot-with-spl.sfp (preloader)")
+        self._get_file(
+            "u-boot-with-spl.sfp",
+            source,
+            design_name,
+            source_root,
+            branch,
+            url_template=url_template,
+        )
+
+        if source == "artifactory":
+            try:
+                build_info = get_info_txt(url_template)
+            except Exception as e:
+                log.warn(e)
+                build_info = None
+            get_gitsha(self.url, daily=False, build_info=build_info)
+
     def _get_files(
         self,
         design_name,
@@ -807,6 +904,7 @@ class downloader(utils):
             kernel_root = False
 
         dt = False
+        cyclone5 = False
 
         if details["carrier"] in ["ZCU102", "ADRV2CRR-FMC"]:
             kernel = "Image"
@@ -830,6 +928,12 @@ class downloader(utils):
             modules = modules
         elif details["carrier"] in ["Maxim", "ADICUP"]:
             pass
+        elif details["carrier"] in ["DE10-NANO"]:
+            kernel = "zImage"
+            kernel_root = "socfpga_cyclone5_common"
+            dt = "socfpga.dtb"
+            arch = "arm"
+            cyclone5 = True
         else:
             raise Exception("Carrier not supported")
 
@@ -882,18 +986,27 @@ class downloader(utils):
                 )
             if folder:
                 if folder == "boot_partition":
-                    self._get_files_boot_partition(
-                        reference_boot_folder,
-                        devicetree_subfolder,
-                        boot_subfolder,
-                        source,
-                        source_root,
-                        branch,
-                        kernel,
-                        kernel_root,
-                        dt,
-                        url_template,
-                    )
+                    if cyclone5:
+                        self._get_files_cyclone5(
+                            design_name,
+                            source,
+                            source_root,
+                            branch,
+                            url_template,
+                        )
+                    else:
+                        self._get_files_boot_partition(
+                            reference_boot_folder,
+                            devicetree_subfolder,
+                            boot_subfolder,
+                            source,
+                            source_root,
+                            branch,
+                            kernel,
+                            kernel_root,
+                            dt,
+                            url_template,
+                        )
                 elif folder == "hdl_linux":
                     self._get_files_hdl(
                         hdl_folder, source, source_root, branch, hdl_output=False
@@ -1065,8 +1178,9 @@ class downloader(utils):
                 sha256_hash.update(data)
                 bar.update(size)
         hash = sha256_hash.hexdigest()
+        file_size = os.path.getsize(fname)
         with open(os.path.join(os.path.dirname(fname), "hashes.txt"), "a") as h:
-            h.write(f"{os.path.basename(fname)},{hash}\n")
+            h.write(f"{os.path.basename(fname)},{hash},{file_size}\n")
 
     def check(self, fname, ref):
         hash_md5 = hashlib.md5()

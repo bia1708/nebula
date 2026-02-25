@@ -953,10 +953,17 @@ class manager:
 
         with open(hash_file, "r") as file:
             for line in file:
-                fname, hash = line.strip().split(",")
+                fname, hash, file_size = line.strip().split(",")
                 # exclude some files
                 if fname in ["bootgen_sysfiles.tgz"]:
                     continue
-                self.net.verify_checksum(
-                    file_path=os.path.join("/boot", fname), reference=hash
-                )
+                if "extlinux" in fname:
+                    self.net.verify_checksum(
+                        file_path=os.path.join("/boot", "extlinux", fname), reference=hash
+                    )
+                elif "u-boot-with-spl" in fname:
+                    self.net.verify_checksum_from_partition(file_size=file_size, reference_hash=hash)
+                else:
+                    self.net.verify_checksum(
+                        file_path=os.path.join("/boot", fname), reference=hash
+                    )
